@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/networkgraph.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <title>Title</title>
+</head>
+<body>
+
+
+<div class="container">
+    <div class="col">
+        <div style="float: left">
+            <img src="logo-recommender.PNG">
+        </div>
+        <div style="float: left; margin-top: 100px; width: 40%">
+            <input class="form-control" type="text" placeholder="Search" type="text" id="myInput" onkeyup="searchFunction()" placeholder="Search for names..">
+        </div>
+        <div style="float: left; margin-top: 105px">
+            <span class="material-icons">search</span>
+        </div>
+        <div style="float: left; margin-top: 100px">
+            <button type="button" name="load_data" id="load_data" class="btn btn-info">View Network</button>
+        </div>
+    </div>
+
+
+</div>
+<div id="network"></div>
+<div class="container">
+    <div class="table-responsive">
+        <br />
+
+        <br />
+        <div id="author_table">
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+<script>
+    // Creating table from the CSV
+    window.onload = function() {
+        $.ajax({
+            url:"output.csv",
+            dataType:"text",
+            success:function(data)
+            {
+                var employee_data = data.split(/\r?\n|\r/);
+                var table_data = '<table class="table table-bordered table-striped">';
+                for(var count = 0; count<employee_data.length; count++)
+                {
+                    // Splitting columns from the commas (CSV - Comma Separated Values)
+                    var cell_data = employee_data[count].split(",");
+                    table_data += '<tr>';
+                    for(var cell_count=0; cell_count<cell_data.length; cell_count++)
+                    {
+                        if(count === 0)
+                        {
+                            table_data += '<th>'+cell_data[cell_count]+'</th>';
+                        }
+                        else
+                        {
+                            table_data += '<td>'+cell_data[cell_count]+'</td>';
+                        }
+                    }
+                    table_data += '</tr>';
+                }
+                table_data += '</table>';
+                $('#author_table').html(table_data);
+            }
+        });
+    };
+</script>
+<script>
+    // Search Function
+    function searchFunction() {
+        // Declare variables
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("myInput");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("author_table");
+        tr = table.getElementsByTagName("tr");
+
+        // Loop through all table rows, and hide those who don't match the search query
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[2];
+            if (td) {
+                txtValue = td.textContent || td.innerText;
+                console.log(txtValue)
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+
+    }
+    function createjson() {
+        // Declare variables
+        var uk, german, australia, as, bm, filter, filter2, filter3, filter4, filter5, filter6, table, tr, td, tdtags, tdauthor, i, txtValue, tagsValue, authorname, ns;
+        var ukauthors = [];
+        var germanauthors = [];
+        var asauthors = [];
+        var nsauthors = [];
+        var australiaauthors = [];
+        var bmauthors = [];
+        uk = 'uk';
+        german = 'german';
+        australia = 'australia';
+        as = 'Autonomous Systems';
+        ns = 'neuroscience';
+        bm = 'Biomedical';
+
+        filter = uk.toUpperCase();
+        filter2 = german.toUpperCase();
+        filter3 = as.toUpperCase();
+        filter4 = ns.toUpperCase();
+        filter5 = australia.toUpperCase();
+        filter6 = bm.toUpperCase();
+        table = document.getElementById("author_table");
+        tr = table.getElementsByTagName("tr");
+
+        // Loop through all table rows, and hide those who don't match the search query
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[1];
+            tdtags = tr[i].getElementsByTagName("td")[2];
+            tdauthor = tr[i].getElementsByTagName("td")[0];
+            if (td) {
+                txtValue = td.textContent || td.innerText;
+                tagsValue = tdtags.textContent || tdtags.innerText;
+                authorname = tdauthor.textContent || tdauthor.innerText;
+                if (txtValue.toUpperCase().includes(filter)) {
+                    ukauthors.push(authorname)
+                }
+                if (txtValue.toUpperCase().includes(filter2)) {
+                    germanauthors.push(authorname)
+                }
+                if (txtValue.toUpperCase().includes(filter5)) {
+                    australiaauthors.push(authorname)
+                }
+                if (tagsValue.toUpperCase().includes(filter3)) {
+                    asauthors.push(authorname)
+                }
+                if (tagsValue.toUpperCase().includes(filter4)) {
+                    nsauthors.push(authorname)
+                }
+                if (tagsValue.toUpperCase().includes(filter6)) {
+                    bmauthors.push(authorname)
+                }
+            }
+        }
+        var authors = [];
+        // uk authors = ['Ruma', 'David', Andrea']
+        for (var j=0; j<ukauthors.length; j++){
+            var couple = ['UK']
+            couple.push(ukauthors[j])
+            authors.push(couple)
+            couple = [];
+
+        }
+        for (var h=0; h<germanauthors.length; h++){
+            var couple1 = ['German']
+            couple1.push(germanauthors[h])
+            authors.push(couple1)
+            couple1 = [];
+        }
+        for (var k=0; k<asauthors.length; k++){
+            var couple2 = ['Autonomous Systems']
+            couple2.push(asauthors[k])
+            authors.push(couple2)
+            couple2 = [];
+        }
+        for (var l=0; l<nsauthors.length; l++){
+            var couple3 = ['Neuroscience']
+            couple3.push(nsauthors[l])
+            authors.push(couple3)
+            couple3 = [];
+        }
+        for (var m=0; m<australiaauthors.length; m++){
+            var couple4 = ['Australia']
+            couple4.push(australiaauthors[m])
+            authors.push(couple4)
+            couple4 = [];
+        }
+        for (var n=0; n<bmauthors.length; n++){
+            var couple5 = ['Biomedical']
+            couple5.push(bmauthors[n])
+            authors.push(couple5)
+            couple4 = [];
+        }
+        console.log(authors)
+        displaynetworkgraph(authors)
+    }
+</script>
+<script>
+    $(document).ready(function(){
+        $('#load_data').click(function(){
+
+            createjson()
+        });
+
+    });
+    var ukcolour = "#ecb27b";
+    var germancolour = "#b258ea";
+    var amazoncolour = "#ce0a8c";
+    var mlcolour = "#ce0a0a";
+    var australiacolour = "#ef9202";
+    var bmcolour = "#08891d";
+    function displaynetworkgraph(authors) {
+        Highcharts.chart('network', {
+            chart: {
+                type: 'networkgraph',
+                marginTop: 80
+            },
+            title: {
+                text: 'Network graph'
+            },
+            plotOptions: {
+                networkgraph: {
+                    keys: ['from', 'to'],
+                    layoutAlgorithm: {
+                        enableSimulation: true,
+                        integration: 'verlet',
+                        linkLength: 100,
+                    }
+                }
+            },
+            series: [{
+                marker: {
+                    radius: 25
+                },
+                dataLabels: {
+                    enabled: true,
+                    linkFormat: '',
+                    allowOverlap: true,style: {
+                        textOutline: false
+                    }
+                },
+                data : authors,
+                nodes: [{
+                    id: 'UK',
+                    color: ukcolour,
+                    marker: {
+                        radius: 35,
+                    }
+                },{
+                    id: 'German',
+                    color: germancolour,
+                    marker: {
+                        radius: 35,
+                    }
+                },{
+                    id: 'Autonomous Systems',
+                    color: amazoncolour,
+                    marker: {
+                        radius: 35,
+                    }
+                },{
+                    id: 'Neuroscience',
+                    color: mlcolour,
+                    marker: {
+                        radius: 35,
+                    }
+                },{
+                    id: 'Australia',
+                    color: australiacolour,
+                    marker: {
+                        radius: 35,
+                    }
+                },{
+                    id: 'Biomedical',
+                    color: bmcolour,
+                    marker: {
+                        radius: 35,
+                    }
+                }]
+
+            }]
+        });
+    }
+</script>
+
+<style>
+    #container {
+        min-width: 320px;
+        max-width: 500px;
+        margin: 0 auto;
+        height: 500px;
+    }
+</style>
+
